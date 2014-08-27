@@ -7,6 +7,8 @@ use Pod::Usage;
 my $account  = shift;
 my $from     = shift;
 my $to       = shift;
+my $subset   = shift;
+my $amount   = shift;
 
 pod2usage() if $account eq '-h';
 
@@ -22,7 +24,14 @@ $client->select( $to )
 $client->select( $from )
     or die $client->last_error;
 
-my @ids = $tools->get_all_ids();
+my @ids;
+given ( $subset ) {
+    when ('newest') { @ids = $tools->get_newest_ids( $amount ); }
+    when ('oldest') { @ids = $tools->get_oldest_ids( $amount ); }
+    when ('random') { @ids = $tools->get_random_ids( $amount ); }
+    default         { @ids = $tools->get_all_ids();             }
+}
+
 if ( @ids ) {
     $client->del_flags( \@ids, $tools->SEEN_FLAG )
         or die $client->last_error;
@@ -39,4 +48,4 @@ __END__
 
 =head1 SYNOPSIS
 
-imap-move <account> <from> <to>
+imap-move <account> <from> <to> [<subset> [<count>]]

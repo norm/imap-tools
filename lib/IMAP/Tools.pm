@@ -3,7 +3,12 @@ use MooseX::Declare;
 
 class IMAP::Tools {
     use Config::Std;
+    use Date::Manip;
+    use List::Util      'shuffle';
+    use Memoize;
     use Net::IMAP::Client;
+
+    memoize('date_string_as_int');
 
     has 'client' => (
         is  => 'rw',
@@ -73,8 +78,65 @@ class IMAP::Tools {
 
         return @ids;
     }
+    method get_newest_ids ( $amount ) {
+        $amount = 10 unless defined $amount and int $amount;
+
+        my $summaries = $self->get_all_summaries();
+        my @ids;
+
+        foreach my $summary ( sort newest_first @$summaries ) {
+            push @ids, $summary->uid;
+            last unless --$amount;
+        }
+
+        return @ids;
+    }
+    method get_oldest_ids ( $amount ) {
+        $amount = 10 unless defined $amount and int $amount;
+
+        my $summaries = $self->get_all_summaries();
+        my @ids;
+
+        foreach my $summary ( sort oldest_first @$summaries ) {
+            push @ids, $summary->uid;
+            last unless --$amount;
+        }
+
+        return @ids;
+    }
+    method get_random_ids ( $amount ) {
+        $amount = 10 unless defined $amount and int $amount;
+
+        my $summaries = $self->get_all_summaries();
+        my @ids;
+
+        foreach my $summary ( shuffle @$summaries ) {
+            push @ids, $summary->uid;
+            last unless --$amount;
+        }
+
+        return @ids;
+    }
     method get_all_summaries {
         my $messages = $self->client->search('ALL');
         return $self->client->get_summaries( $messages );
+    }
+
+    sub newest_first {
+        my $a_date = date_string_as_int( $a->internaldate );
+        my $b_date = date_string_as_int( $b->internaldate );
+        
+        return $b_date <=> $a_date;
+    }
+    sub oldest_first {
+        my $a_date = date_string_as_int( $a->internaldate );
+        my $b_date = date_string_as_int( $b->internaldate );
+        
+        return $a_date <=> $b_date;
+    }
+    sub date_string_as_int {
+        my $string = shift;
+        
+        return UnixDate( $string, '%s' );
     }
 }

@@ -42,7 +42,15 @@ Scripts installed
 
 Move email messages from inside one folder to another.
 
-Arguments are the account, the 'from' folder, the 'to' folder.
+Arguments are the account, the 'from' folder, the 'to' folder. Then optionally
+a subset ('newest', 'oldest' or 'random') if you don't want to move all
+messages, and a count (defaults to 10).
 
     # move everything from the "tonight" folder to the inbox
     imap-move cackhanded 03-postpone/tonight INBOX
+
+    # move 10 randomly picked messages from "holiday" to the inbox
+    imap-move work holiday INBOX random
+
+    # move the newest 20 messages from "on-hold" to the inbox
+    imap-move gmail on-hold INBOX newest 20
