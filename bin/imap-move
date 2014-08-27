@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use Modern::Perl '2012';
+no warnings 'experimental::smartmatch';
 
 use IMAP::Tools;
 use Pod::Usage;
