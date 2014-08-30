@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+use Modern::Perl '2012';
+
+use IMAP::Tools;
+use Pod::Usage;
+
+my $account = shift // '-h';
+my $folder  = shift // 'INBOX';
+
+pod2usage() if $account eq '-h';
+
+my $tools  = IMAP::Tools->new();
+my $client = $tools->login_to_imap_server( $account );
+
+$folder = $tools->imap_folder( $folder );
+$client->select( $folder )
+    or die $client->last_error;
+
+my @ids = $tools->get_all_ids();
+$client->add_flags( \@ids, $tools->SEEN_FLAG )
+    if 'read' ~~ @ARGV;
+$client->del_flags( \@ids, $tools->SEEN_FLAG )
+    if 'unread' ~~ @ARGV;
+$client->add_flags( \@ids, $tools->FLAGGED_FLAG )
+    if 'flagged' ~~ @ARGV;
+$client->del_flags( \@ids, $tools->FLAGGED_FLAG )
+    if 'unflagged' ~~ @ARGV;
+
+__END__
+
+=head1 SYNOPSIS
+
+imap-flag <account> <folder> ( read|unread | flagged|unflagged )

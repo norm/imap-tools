@@ -79,3 +79,20 @@ Arguments are the account and the folder (which defaults to `INBOX`).
 
     # what to do? what to do?
     imap-list gmail outstanding/todo
+
+### imap-mark
+
+Update status of messages in a folder.
+
+Arguments are the account, the folder, and then one or more status options:
+
+*   read
+*   unread
+*   flagged
+*   unflagged
+
+    # mark everything unread
+    imap-mark cackhanded INBOX unread
+
+    # mark everything unread and important
+    imap-mark gmail outstanding/todo unread flagged
