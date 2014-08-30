@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use Modern::Perl '2012';
+
+use Date::Manip;
+use IMAP::Tools;
+use Pod::Usage;
+use POSIX       'strftime';
+
+my $account = shift // '-h';
+my $folder  = shift // 'INBOX';
+
+pod2usage() if $account eq '-h';
+
+my $tools  = IMAP::Tools->new();
+my $client = $tools->login_to_imap_server( $account );
+
+$folder = $tools->imap_folder( $folder );
+$client->select( $folder )
+    or die $client->last_error;
+
+my $summaries = $tools->get_all_summaries();
+foreach my $summary ( @$summaries ) {
+    my $read = $tools->SEEN_FLAG ~~ $summary->{'flags'};
+
+    printf "%s %s %s\n  %s\n\n",
+        ( $read ? ' ' : '*' ),
+        UnixDate( $summary->{'date'}, '%Y-%m-%d %k:%M' ),
+        $summary->{'from'}[0],
+        $summary->{'subject'};
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+imap-list <account> <folder>
