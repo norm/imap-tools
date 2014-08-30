@@ -10,6 +10,10 @@ class IMAP::Tools {
 
     memoize('date_string_as_int');
 
+    has 'account' => (
+        is  => 'rw',
+        isa => 'HashRef',
+    );
     has 'client' => (
         is  => 'rw',
         isa => 'Net::IMAP::Client',
@@ -40,13 +44,14 @@ class IMAP::Tools {
     }
 
     method login_to_imap_server ( $account ) {
-        my $account_config = $self->config->{$account};
-        my $host           = $account_config->{'host'} // 'localhost';
-        my $client         = Net::IMAP::Client->new(
+        $self->account( $self->config->{$account} );
+
+        my $host   = $self->account->{'host'} // 'localhost';
+        my $client = Net::IMAP::Client->new(
                 server => $host,
-                user   => $account_config->{'user'},
-                pass   => $account_config->{'pass'},
-                ssl    => $account_config->{'ssl'} // 0,
+                user   => $self->account->{'user'},
+                pass   => $self->account->{'pass'},
+                ssl    => $self->account->{'ssl'} // 0,
             );
 
         die "Couldn't connect: $!"
@@ -61,6 +66,12 @@ class IMAP::Tools {
     }
 
     method imap_folder ( $folder ) {
+        return $folder
+            if $folder eq 'INBOX';
+
+        $folder = sprintf '%s/%s', $self->account->{'prefix'}, $folder
+            if defined $self->account->{'prefix'};
+
         my $separator = $self->client->separator;
 
         $folder =~ s{/}{$separator}g;

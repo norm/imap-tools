@@ -5,8 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'IMAP::Tools',
     AUTHOR              => 'Mark Norman Francis <norm@cackhanded.net>',
-    VERSION             => '0.2',
+    VERSION             => '0.3',
     EXE_FILES           => [ 
+        'bin/imap-folder',
         'bin/imap-move',
     ],
     PREREQ_PM => {

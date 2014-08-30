@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+use Modern::Perl '2012';
+
+use IMAP::Tools;
+use Pod::Usage;
+
+my $account = shift // '-h';
+my $action  = shift // '';
+
+pod2usage() if $account eq '-h'
+            or ( $action ne 'create' and $action ne 'delete' );
+
+my $tools  = IMAP::Tools->new();
+my $client = $tools->login_to_imap_server( $account );
+
+FOLDER:
+foreach my $folder ( @ARGV ) {
+    $folder = $tools->imap_folder( $folder );
+    say "$folder";
+
+    if ( $action eq 'create' ) {
+        $client->create_folder( $folder )
+            and next FOLDER;
+
+        die $client->last_error
+            if $client->last_error !~ m/already exists/;
+    }
+    if ( $action eq 'delete' ) {
+        $client->delete_folder( $folder )
+            and next FOLDER;
+
+        die $client->last_error
+            if $client->last_error !~ m/does not exist/;
+    }
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+imap-folder <account> (create|delete) <folder> [...]
