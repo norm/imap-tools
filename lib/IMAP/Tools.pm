@@ -78,6 +78,17 @@ class IMAP::Tools {
 
         return $folder;
     }
+    method human_folder ( $folder ) {
+        my $prefix    = $self->account->{'prefix'};
+        my $separator = "\\" . $self->client->separator;
+
+        $folder =~ s{^$prefix$separator}{}
+            if defined $prefix;
+
+        $folder =~ s{$separator}{/}g;
+
+        return $folder;
+    }
 
     method get_all_ids {
         my $summaries = $self->get_all_summaries();

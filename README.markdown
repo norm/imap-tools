@@ -96,3 +96,24 @@ Arguments are the account, the folder, and then one or more status options:
 
     # mark everything unread and important
     imap-mark gmail outstanding/todo unread flagged
+
+### imap-list-folders
+
+List all folders in an account.
+
+Arguments are the account.
+
+    # list folders on google
+    imap-list-folders gmail
+
+*Important note*: there is a parsing bug in the `Net::IMAP::Client` library at
+version 0.9505 that means folder names that start with numbers (eg
+`03-postpone/tonight`) are returned simply as the number. I have a 
+[patched version 0.9506a][patch] which you can install instead (but be warned
+ it has not had extensive testing, so if you use `Net::IMAP::Client` in other
+scripts/libraries you might not want to install this).
+
+    # upgrade Net::IMAP::Client
+    sudo cpanm git@github.com:norm/p5-Net-IMAP-Client-patch.git
+
+[patch]: https://github.com/norm/p5-Net-IMAP-Client-patch/
