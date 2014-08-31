@@ -117,3 +117,13 @@ scripts/libraries you might not want to install this).
     sudo cpanm git@github.com:norm/p5-Net-IMAP-Client-patch.git
 
 [patch]: https://github.com/norm/p5-Net-IMAP-Client-patch/
+
+### imap-depostpone
+
+Handles de-postponing email postponed by moving it into specially named
+folders.
+
+Arguments are the account, and optionally 'create' to create the folders
+it uses or 'crontab' to get a reminder of what to put in your crontab.
+
+This needs more explanation.

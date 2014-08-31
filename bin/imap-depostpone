@@ -1,0 +1,86 @@
+#!/bin/bash
+
+POSTPONE_FOLDER="${IMAP_POSTPONE_FOLDER:=postpone}"
+
+account="$1"
+action="$2"
+day_folder="${POSTPONE_FOLDER}/day/`date +%u-%A`"
+month_folder="${POSTPONE_FOLDER}/month/`date +%m-%B`"
+
+if [ "$account" = '-h' ]; then
+    perldoc -tT $0 | sed -e 's/SYNOPSIS/Usage:/'
+    exit 0
+fi
+
+if [ -z "$action" ]; then
+
+    # DEPOSTPONE EMAIL
+    # ----------------
+    imap-move $account "$day_folder"          INBOX
+    imap-move $account "${POSTPONE_FOLDER}"   INBOX
+    imap-move $account "${POSTPONE_FOLDER}/1" INBOX
+
+    imap-move $account "${POSTPONE_FOLDER}/"{2,1}
+    imap-move $account "${POSTPONE_FOLDER}/"{3,2}
+    imap-move $account "${POSTPONE_FOLDER}/"{4,3}
+    imap-move $account "${POSTPONE_FOLDER}/"{5,4}
+    imap-move $account "${POSTPONE_FOLDER}/"{6,5}
+    imap-move $account "${POSTPONE_FOLDER}/"{7,6}
+
+    # move weeks on a Monday
+    if [ `date +%u` = '1' ]; then
+        imap-move $account "${POSTPONE_FOLDER}/week"   INBOX
+        imap-move $account "${POSTPONE_FOLDER}/week/1" INBOX
+
+        imap-move $account "${POSTPONE_FOLDER}/week/"{2,1}
+        imap-move $account "${POSTPONE_FOLDER}/week/"{3,2}
+        imap-move $account "${POSTPONE_FOLDER}/week/"{4,3}
+    fi
+
+    # first of the month
+    if [ `date +%d` = '01' ]; then
+        imap-move $account "${POSTPONE_FOLDER}/month" INBOX
+    fi
+
+else
+
+    if [ $action = 'make' ]; then
+
+        # MAKE THE FOLDERS
+        # ----------------
+        imap-folder $account create                                         \
+            "${POSTPONE_FOLDER}"                                            \
+            "${POSTPONE_FOLDER}/0-tonight"                                  \
+            "${POSTPONE_FOLDER}/"{1,2,3,4,5,6,7}                            \
+            "${POSTPONE_FOLDER}/day"                                        \
+            "${POSTPONE_FOLDER}/day/"{1-Mon,2-Tues,3-Wednes,4-Thurs}day     \
+            "${POSTPONE_FOLDER}/day/"{5-Fri,6-Satur,7-Sun}day               \
+            "${POSTPONE_FOLDER}/week"                                       \
+            "${POSTPONE_FOLDER}/week/"{1,2,3,4}                             \
+            "${POSTPONE_FOLDER}/month"
+
+    elif [ $action = 'crontab' ]; then
+
+        # SHOW EXAMPLE CRONTAB
+        # --------------------
+
+        cat <<END
+#mn   hr    dom   mon   dow   cmd
+00    5     *     *     *     imap-depostpone $account
+00    18    *     *     *     imap-move $account ${POSTPONE_FOLDER}/0-tonight INBOX
+END
+
+    fi
+fi
+exit
+
+=head1 SYNOPSIS
+
+    # first, set up the folders
+    imap-depostpone <account> create
+
+    # then, either depostpone manually...
+    imap-depostpone <account> 
+
+    # ...or depostpone in cron, find out the entries
+    imap-depostpone <account> crontab

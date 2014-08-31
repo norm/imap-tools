@@ -5,8 +5,9 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME                => 'IMAP::Tools',
     AUTHOR              => 'Mark Norman Francis <norm@cackhanded.net>',
-    VERSION             => '0.6',
+    VERSION             => '0.7',
     EXE_FILES           => [ 
+        'bin/imap-depostpone',
         'bin/imap-folder',
         'bin/imap-list',
         'bin/imap-list-folders',
