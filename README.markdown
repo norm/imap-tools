@@ -54,3 +54,28 @@ messages, and a count (defaults to 10).
 
     # move the newest 20 messages from "on-hold" to the inbox
     imap-move gmail on-hold INBOX newest 20
+
+### imap-folder
+
+Create or delete mail folders.
+
+Arguments are the account, `create` or `delete` and then one or more folder
+names.
+
+    # create two folders
+    imap-folder cackhanded create 01-spam 03-postpone/tonight
+
+    # delete a folder
+    imap-folder gmail delete on-hold
+
+### imap-list
+
+List the messages in a folder.
+
+Arguments are the account and the folder (which defaults to `INBOX`).
+
+    # list new email
+    imap-list cackhanded
+
+    # what to do? what to do?
+    imap-list gmail outstanding/todo
