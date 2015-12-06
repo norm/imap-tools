@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 use Modern::Perl '2012';
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
 
 use Date::Manip;
 use IMAP::Tools;
