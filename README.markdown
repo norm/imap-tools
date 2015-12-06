@@ -91,6 +91,8 @@ Arguments are the account, the folder, and then one or more status options:
 *   flagged
 *   unflagged
 
+Examples:
+
     # mark everything unread
     imap-mark cackhanded INBOX unread
 
